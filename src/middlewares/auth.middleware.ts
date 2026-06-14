@@ -3,6 +3,8 @@ import type { NextFunction, Request, Response } from 'express';
 import { tokenService } from '../services/token.service.js';
 import { AppError } from '../utils/errors.js';
 
+export const AUTH_METADATA = Symbol('auth-metadata');
+
 export const authMiddleware = (
   req: Request,
   _res: Response,
@@ -34,3 +36,9 @@ export const authMiddleware = (
     return;
   }
 };
+
+export const documentedAuthMiddleware = Object.assign(authMiddleware, {
+  [AUTH_METADATA]: {
+    securityScheme: 'bearerAuth'
+  }
+});

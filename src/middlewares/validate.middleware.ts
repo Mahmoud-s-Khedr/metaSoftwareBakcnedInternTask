@@ -3,7 +3,14 @@ import type { AnyZodObject, ZodError } from 'zod';
 
 import { AppError } from '../utils/errors.js';
 
-type ValidationTarget = 'body' | 'query' | 'params';
+export type ValidationTarget = 'body' | 'query' | 'params';
+
+export const VALIDATION_METADATA = Symbol('validation-metadata');
+
+export type ValidationMetadata = {
+  schema: AnyZodObject;
+  target: ValidationTarget;
+};
 
 const mapZodIssues = (error: ZodError): string[] => {
   return error.issues.map((issue) => {
@@ -27,4 +34,20 @@ export const validateMiddleware = (
     req[target] = result.data;
     next();
   };
+};
+
+export const documentedValidateMiddleware = (
+  schema: AnyZodObject,
+  target: ValidationTarget = 'body'
+): RequestHandler => {
+  const middleware = validateMiddleware(schema, target) as RequestHandler & {
+    [VALIDATION_METADATA]?: ValidationMetadata;
+  };
+
+  middleware[VALIDATION_METADATA] = {
+    schema,
+    target
+  };
+
+  return middleware;
 };

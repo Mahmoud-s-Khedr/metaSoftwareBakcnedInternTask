@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
 import { authController } from '../controllers/auth.controller.js';
-import { authMiddleware } from '../middlewares/auth.middleware.js';
-import { validateMiddleware } from '../middlewares/validate.middleware.js';
+import { documentedAuthMiddleware } from '../middlewares/auth.middleware.js';
+import { documentedValidateMiddleware } from '../middlewares/validate.middleware.js';
 import {
   loginSchema,
   logoutSchema,
@@ -12,13 +12,21 @@ import {
 
 const router = Router();
 
-router.post('/register', validateMiddleware(registerSchema), authController.register);
-router.post('/login', validateMiddleware(loginSchema), authController.login);
-router.post('/refresh', validateMiddleware(refreshTokenSchema), authController.refresh);
-router.post('/logout', validateMiddleware(logoutSchema), authController.logout);
+router.post(
+  '/register',
+  documentedValidateMiddleware(registerSchema),
+  authController.register
+);
+router.post('/login', documentedValidateMiddleware(loginSchema), authController.login);
+router.post(
+  '/refresh',
+  documentedValidateMiddleware(refreshTokenSchema),
+  authController.refresh
+);
+router.post('/logout', documentedValidateMiddleware(logoutSchema), authController.logout);
 router.post(
   '/logout-all',
-  authMiddleware,
+  documentedAuthMiddleware,
   authController.logoutAll
 );
 

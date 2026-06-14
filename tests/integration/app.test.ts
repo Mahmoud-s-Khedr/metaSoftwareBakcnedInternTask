@@ -35,6 +35,60 @@ describe('app bootstrap', () => {
     });
   });
 
+  it('serves Swagger UI from GET /docs/', async () => {
+    const { createApp } = await import('../../src/app.js');
+    const app = createApp();
+
+    const response = await request(app).get('/docs/');
+
+    expect(response.status).toBe(200);
+    expect(response.text).toContain('Swagger UI');
+  });
+
+  it('serves the generated OpenAPI document from GET /docs.json', async () => {
+    const { createApp } = await import('../../src/app.js');
+    const app = createApp();
+
+    const response = await request(app).get('/docs.json');
+
+    expect(response.status).toBe(200);
+    expect(response.body.openapi).toBe('3.1.0');
+    expect(response.body.components.securitySchemes.bearerAuth).toEqual({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT'
+    });
+    expect(
+      response.body.paths['/auth/register'].post.requestBody.content['application/json']
+        .schema.required
+    ).toEqual(['name', 'email', 'password']);
+    expect(
+      response.body.paths['/auth/login'].post.requestBody.content['application/json']
+        .schema.required
+    ).toEqual(['email', 'password']);
+    expect(
+      response.body.paths['/auth/refresh'].post.requestBody.content['application/json']
+        .schema.required
+    ).toEqual(['refreshToken']);
+    expect(
+      response.body.paths['/auth/logout'].post.requestBody.content['application/json']
+        .schema.required
+    ).toEqual(['refreshToken']);
+    expect(
+      response.body.paths['/auth/register'].post.requestBody.content['application/json']
+        .schema.properties.email.format
+    ).toBe('email');
+    expect(response.body.paths['/auth/logout-all'].post.security).toEqual([
+      { bearerAuth: [] }
+    ]);
+    expect(response.body.paths['/health'].get).toBeDefined();
+    expect(response.body.paths['/auth/register'].post).toBeDefined();
+    expect(response.body.paths['/auth/login'].post).toBeDefined();
+    expect(response.body.paths['/auth/refresh'].post).toBeDefined();
+    expect(response.body.paths['/auth/logout'].post).toBeDefined();
+    expect(response.body.paths['/auth/logout-all'].post).toBeDefined();
+  });
+
   it('returns the standardized 404 response for unknown routes', async () => {
     const { createApp } = await import('../../src/app.js');
     const app = createApp();
