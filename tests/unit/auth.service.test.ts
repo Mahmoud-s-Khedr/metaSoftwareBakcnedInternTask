@@ -1,5 +1,5 @@
 jest.mock('../../src/config/prisma.js', () => {
-  const prisma: any = {
+  const prisma = {
     user: {
       findUnique: jest.fn(),
       create: jest.fn()

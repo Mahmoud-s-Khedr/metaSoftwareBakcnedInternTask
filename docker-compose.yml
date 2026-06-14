@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: blog_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U user -d blog_db']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://user:password@postgres:5432/blog_db
+      JWT_ACCESS_SECRET: access-secret-access-secret-123456
+      REFRESH_TOKEN_SECRET: refresh-secret-refresh-secret-1234
+      ACCESS_TOKEN_EXPIRES_IN: 15m
+      REFRESH_TOKEN_EXPIRES_IN_DAYS: 7
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: >
+      sh -c "
+      if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then npm ci; fi &&
+      npx prisma generate &&
+      npx prisma migrate deploy &&
+      npm run dev
+      "
+
+volumes:
+  postgres_data:

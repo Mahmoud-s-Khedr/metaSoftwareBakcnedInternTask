@@ -1,0 +1,33 @@
+services:
+  postgres-test:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: blog_test_db
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U user -d blog_test_db']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api-test:
+    build:
+      context: .
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    environment:
+      NODE_ENV: test
+      PORT: 3000
+      DATABASE_URL: postgresql://user:password@postgres-test:5432/blog_test_db
+      JWT_ACCESS_SECRET: access-secret-access-secret-123456
+      REFRESH_TOKEN_SECRET: refresh-secret-refresh-secret-1234
+      ACCESS_TOKEN_EXPIRES_IN: 15m
+      REFRESH_TOKEN_EXPIRES_IN_DAYS: 7
+    command: >
+      sh -c "
+      until pg_isready -h postgres-test -U user -d blog_test_db; do sleep 1; done &&
+      npx prisma migrate deploy &&
+      npm test
+      "
