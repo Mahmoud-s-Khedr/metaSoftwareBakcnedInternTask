@@ -12,14 +12,19 @@
     "start": "node dist/server.js",
     "lint": "eslint .",
     "format": "prettier --write .",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
     "test": "jest --runInBand",
     "test:unit": "jest --runInBand tests/unit",
     "test:integration": "jest --runInBand tests/integration",
     "test:e2e": "jest --runInBand tests/e2e"
   },
   "dependencies": {
+    "@prisma/client": "^6.16.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
+    "prisma": "^6.16.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
