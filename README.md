@@ -6,10 +6,9 @@ A production-style REST API for a personal blogging platform, built as an intern
 
 ## Live links
 
-- **Live API:** https://metasoftwarebakcnedinternta-production.up.railway.app
-- **Swagger UI:** https://metasoftwarebakcnedinternta-production.up.railway.app/docs
+- **Live API:** https://metasoftwarebakcnedinterntask-production.up.railway.app
+- **Swagger UI:** https://metasoftwarebakcnedinterntask-production.up.railway.app/docs
 - **GitHub Repository:** https://github.com/Mahmoud-s-Khedr/metaSoftwareBakcnedInternTask
-- **Loom Walkthrough:** *(coming soon)*
 
 ---
 

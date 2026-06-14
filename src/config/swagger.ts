@@ -51,7 +51,6 @@ type ResponsesObject = Record<string, unknown>;
 type PathsObject = Record<string, Record<string, unknown>>;
 type DocumentObject = Record<string, unknown>;
 
-const DEFAULT_SERVER_URL = 'http://localhost:3000';
 
 const successEnvelopeSchema = {
   type: 'object',
@@ -586,11 +585,6 @@ export const createSwaggerSpec = (
       description:
         'Auto-generated OpenAPI documentation derived from Express routes and Zod validators.'
     },
-    servers: [
-      {
-        url: DEFAULT_SERVER_URL
-      }
-    ],
     components: {
       securitySchemes: {
         bearerAuth: {
