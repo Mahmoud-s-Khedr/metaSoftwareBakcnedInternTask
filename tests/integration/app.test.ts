@@ -1,12 +1,29 @@
 import express from 'express';
 import request from 'supertest';
 
-import { createApp } from '../../src/app.js';
-import { errorHandler } from '../../src/middlewares/error.middleware.js';
-import { AppError } from '../../src/utils/errors.js';
-
 describe('app bootstrap', () => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    jest.resetModules();
+    process.env = {
+      ...originalEnv,
+      NODE_ENV: 'test',
+      PORT: '4000',
+      DATABASE_URL: 'postgresql://user:password@localhost:5432/blog_db',
+      JWT_ACCESS_SECRET: 'access-secret-access-secret-123456',
+      REFRESH_TOKEN_SECRET: 'refresh-secret-refresh-secret-1234',
+      ACCESS_TOKEN_EXPIRES_IN: '15m',
+      REFRESH_TOKEN_EXPIRES_IN_DAYS: '7'
+    };
+  });
+
+  afterAll(() => {
+    process.env = originalEnv;
+  });
+
   it('returns a healthy response from GET /health', async () => {
+    const { createApp } = await import('../../src/app.js');
     const app = createApp();
 
     const response = await request(app).get('/health');
@@ -19,6 +36,7 @@ describe('app bootstrap', () => {
   });
 
   it('returns the standardized 404 response for unknown routes', async () => {
+    const { createApp } = await import('../../src/app.js');
     const app = createApp();
 
     const response = await request(app).get('/missing-route');
@@ -32,6 +50,8 @@ describe('app bootstrap', () => {
   });
 
   it('formats application errors via the global error middleware', async () => {
+    const { errorHandler } = await import('../../src/middlewares/error.middleware.js');
+    const { AppError } = await import('../../src/utils/errors.js');
     const app = express();
 
     app.get('/boom', (_req, _res, next) => {
@@ -50,6 +70,7 @@ describe('app bootstrap', () => {
   });
 
   it('formats unexpected errors via the global error middleware', async () => {
+    const { errorHandler } = await import('../../src/middlewares/error.middleware.js');
     const app = express();
 
     app.get('/boom', () => {

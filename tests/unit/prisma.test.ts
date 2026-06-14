@@ -7,7 +7,11 @@ describe('prisma config', () => {
       ...originalEnv,
       NODE_ENV: 'test',
       PORT: '4000',
-      DATABASE_URL: 'postgresql://user:password@localhost:5432/blog_db'
+      DATABASE_URL: 'postgresql://user:password@localhost:5432/blog_db',
+      JWT_ACCESS_SECRET: 'access-secret-access-secret-123456',
+      REFRESH_TOKEN_SECRET: 'refresh-secret-refresh-secret-1234',
+      ACCESS_TOKEN_EXPIRES_IN: '15m',
+      REFRESH_TOKEN_EXPIRES_IN_DAYS: '7'
     };
   });
 
